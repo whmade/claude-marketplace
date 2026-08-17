@@ -1,0 +1,18 @@
+{
+  "name": "whmade",
+  "owner": {
+    "name": "whmade",
+    "url": "https://github.com/whmade"
+  },
+  "description": "Shared Claude Code workflow skills for whme/ and whmade/ repositories.",
+  "plugins": [
+    {
+      "name": "workflows",
+      "source": "./plugins/workflows",
+      "description": "commit, github-pr and scrutinize skills. Generic by default; each repo specializes them through an AGENTS.md/CLAUDE.md conventions contract.",
+      "license": "MIT",
+      "category": "workflow",
+      "keywords": ["commit", "pull-request", "code-review", "self-review"]
+    }
+  ]
+}
