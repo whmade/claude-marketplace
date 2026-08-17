@@ -1,0 +1,12 @@
+{
+  "name": "workflows",
+  "description": "Shared development workflow skills: commit, github-pr and scrutinize. Generic by default; each repo specializes them through an AGENTS.md/CLAUDE.md conventions contract.",
+  "author": {
+    "name": "whmade",
+    "url": "https://github.com/whmade"
+  },
+  "homepage": "https://github.com/whmade/claude-marketplace",
+  "repository": "https://github.com/whmade/claude-marketplace",
+  "license": "MIT",
+  "keywords": ["commit", "pull-request", "code-review", "self-review"]
+}

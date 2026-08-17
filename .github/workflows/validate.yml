@@ -1,0 +1,26 @@
+name: validate
+
+# The `workflows` plugin is unversioned, so every commit to `main` ships to
+# consumers on their next session. This gate keeps `main` shippable. A branch
+# ruleset makes the `validate` check required before a change lands on `main` -
+# create it with scripts/setup-branch-ruleset.sh (needs the repo to be public).
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Structural validation (authoritative)
+        run: node scripts/validate-marketplace.mjs
+
+      - name: claude plugin validate (advisory)
+        continue-on-error: true
+        run: |
+          npm install -g @anthropic-ai/claude-code
+          claude plugin validate . --strict
+          claude plugin validate ./plugins/workflows --strict
