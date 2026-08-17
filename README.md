@@ -13,7 +13,7 @@ It ships one plugin, **`workflows`**, bundling three skills:
 
 ## Using it in a repo
 
-Enable it for everyone on a repo by committing this to its `.claude/settings.json`:
+Declare the marketplace and enable the plugin for everyone on a repo by committing this to its `.claude/settings.json`:
 
 ```json
 {
@@ -27,8 +27,13 @@ Enable it for everyone on a repo by committing this to its `.claude/settings.jso
 }
 ```
 
-The plugin is a relative-path source inside this repo, so it installs with no extra step once a teammate trusts the folder.
-Updates apply on the next launch or `/reload-plugins`.
+Those settings make the marketplace known and the plugin enabled once the folder is trusted, but Claude Code does not auto-install a plugin from an external GitHub marketplace - each machine installs it once:
+
+```sh
+claude plugin install workflows@whmade    # or /plugin install workflows@whmade in-session
+```
+
+Then reload with `/reload-plugins` (or restart) and the `/workflows:*` skills are available; `autoUpdate` keeps them current on later launches.
 A repo's own bare `/commit` in `.claude/skills/` coexists with the namespaced plugin skill; delete the local copy once migrated.
 
 ## The conventions contract (how repos specialize the skills)
