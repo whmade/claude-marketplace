@@ -5,6 +5,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
+### Changed
+- Skills now track their Definition-of-done checklist with Claude Code's Task tools (`TaskCreate`/`TaskUpdate`/`TaskList`) instead of the legacy `TodoWrite`. On Opus 4.8, Sonnet 5, Fable 5, and later these tools are opt-in: set `CLAUDE_CODE_ENABLE_TODO_TOOLS=1` in `.claude/settings.json` (see the README) or the skills have no task tool to build their checklist with.
+
 ### Added
 - Initial `workflows` plugin with three skills distilled from the copies that had drifted across `whme/` and `whmade/` repos:
   - `commit` - repo-aware commit messages with the mandatory `Co-authored-by` trailer.

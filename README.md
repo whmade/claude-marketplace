@@ -36,6 +36,21 @@ claude plugin install workflows@whmade    # or /plugin install workflows@whmade 
 Then reload with `/reload-plugins` (or restart) and the `/workflows:*` skills are available; `autoUpdate` keeps them current on later launches.
 A repo's own bare `/commit` in `.claude/skills/` coexists with the namespaced plugin skill; delete the local copy once migrated.
 
+### Enable the task-tracking tools (newer models)
+
+The skills track their **Definition of done** with Claude Code's built-in Task tools (`TaskCreate`/`TaskUpdate`/`TaskList`/`TaskGet`).
+On Opus 4.8, Sonnet 5, Fable 5, and later, these tools are **opt-in** - a session that has not enabled them exposes no task tool, and the skills cannot build their checklist ([Claude Docs: Todo tracking](https://code.claude.com/docs/en/agent-sdk/todo-tracking)).
+Enable them by setting an environment variable in `.claude/settings.json` (repo-level as below, or your user-level `~/.claude/settings.json` to cover every session):
+
+```json
+{
+  "env": { "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1" }
+}
+```
+
+Older models provide the Task tools by default, so this is only needed on the newer families.
+The variable is read at session start; reload or restart after adding it.
+
 ## The conventions contract (how repos specialize the skills)
 
 The skills are generic; each repo tailors them by documenting its specifics in `AGENTS.md` or `CLAUDE.md`.
