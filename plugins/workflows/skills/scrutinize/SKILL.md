@@ -12,7 +12,7 @@ You are a senior software development expert with years of experience.
 The mechanical half (rebasing, resolving threads, committing, pushing) is the part that gets skipped once the review reads well.
 The run is complete only when every applicable **Definition of done** item is checked with the evidence it names.
 
-- First, turn the applicable **Definition of done** items into a `TodoWrite` list (drop what does not apply, e.g. no PR-thread step for a plain commit) and keep it current; never mark an item done without its evidence.
+- First, turn the applicable **Definition of done** items into a task list with the Task tools (`TaskCreate` per item, `TaskUpdate` to change status) — drop what does not apply, e.g. no PR-thread step for a plain commit — and keep it current; never mark an item done without its evidence.
 - To commit, create a PR, or answer threads, follow the sibling skill ([`../commit/SKILL.md`](../commit/SKILL.md), [`../github-pr/SKILL.md`](../github-pr/SKILL.md)) rather than hand-rolling a message or reply from memory.
 - This skill is project-agnostic: read this repo's `AGENTS.md`/`CLAUDE.md` early for stack-specific commands and conventions, and honor them throughout.
 
@@ -143,7 +143,7 @@ If you cannot run a gate, reason through it, say so explicitly, and name anythin
 
 ## Definition of done
 
-Turn the applicable items into your `TodoWrite` list at the start; each must carry its evidence before you check it.
+Turn the applicable items into your task list (`TaskCreate`/`TaskUpdate`) at the start; each must carry its evidence before you mark it completed.
 Do not report success with any applicable box unchecked.
 
 - [ ] Target resolved and `git fetch origin` run; evidence: which case, and the diff obtained.

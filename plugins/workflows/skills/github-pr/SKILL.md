@@ -7,7 +7,7 @@ description: Create, update, or review a GitHub pull request - open a PR, push u
 # GitHub Pull Requests
 
 Use this skill to **create** a new PR, **update** an existing one, or **respond to feedback** on a PR.
-Turn the applicable **Definition of done** items into a `TodoWrite` list and keep it current, so no comment is forgotten.
+Turn the applicable **Definition of done** items into a task list with the Task tools (`TaskCreate`/`TaskUpdate`) and keep it current, so no comment is forgotten.
 
 ## First, read this repo's conventions
 
@@ -160,7 +160,7 @@ Anything still open needs a fix or was intentionally deferred - never silently s
 
 ## Definition of done
 
-Track the applicable items with `TodoWrite`; each must hold before you report the PR done.
+Track the applicable items with the Task tools (`TaskCreate`/`TaskUpdate`); each must hold before you report the PR done.
 
 Creating a PR:
 
