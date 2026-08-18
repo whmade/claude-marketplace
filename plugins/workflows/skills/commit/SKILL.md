@@ -89,7 +89,7 @@ If a pre-commit hook fails, fix the issue and create a new commit - do not `--am
 
 ## Definition of done
 
-Track these with the Task tools (`TaskCreate`/`TaskUpdate`); each must hold before the commit is done:
+Confirm the message items below against the commit you actually made (`git log -1 --format=%B`), not from memory; the first and last are about how you committed, so confirm those from what you ran:
 
 - [ ] Repo `## Commit conventions` read and honored (scopes, reference style, punctuation).
 - [ ] Subject imperative, first word capitalized when unscoped, no trailing period, under 72 chars; body explains WHY, wrapped at 72.
