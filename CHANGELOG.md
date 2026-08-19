@@ -5,6 +5,14 @@ The plugin is unversioned: its version is the commit SHA, and every commit on `m
 Nothing is staged for a release, so there is no "unreleased" section - every entry below is already live.
 Entries are append-only: once one lands it is never edited or deleted, and a change that supersedes an earlier one is added as a new entry, so the log keeps showing what consumers already ran.
 
+## Enforce the Definition of done with a Stop-hook verifier
+
+Enforcing the Definition of done no longer relies on the model self-tracking with a task tool (which newer models can lack or decline).
+`scrutinize` now registers a `Stop`-hook verifier in its frontmatter: an independent `agent`-type hook re-derives each done-item from `git`/`gh` state when the turn ends and blocks completion when one does not hold.
+`commit` and `github-pr` reframe their Definition of done as evidence-showing self-verification.
+This supersedes the Task-tools tracking below and removes the `CLAUDE_CODE_ENABLE_TODO_TOOLS` requirement.
+Note: the hook is `once: true`, so it checks a single stop; and it runs under the session's own tool permissions and cannot prompt for more, so a session that does not already allow `git`/`gh` reads leaves it judging from the transcript alone.
+
 ## Track the Definition of done with the Task tools
 
 The skills track their Definition-of-done checklist with Claude Code's Task tools (`TaskCreate`/`TaskUpdate`/`TaskList`) instead of the legacy `TodoWrite`.

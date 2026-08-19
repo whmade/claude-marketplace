@@ -3,6 +3,30 @@
 name: scrutinize
 description: Self-review pass that critically challenges, tightens, verifies, and publishes a change. Takes a GitHub PR, a commit, a git range, or empty for the current working changes. Use this whenever the user asks to scrutinize, self-review, review, or clean up a change before committing or pushing.
 argument-hint: "GH PR <number> | commit-id | git-ref-or-range | empty for working changes"
+hooks:
+  Stop:
+    - hooks:
+        - type: agent
+          model: claude-sonnet-5
+          timeout: 300
+          once: true
+          statusMessage: Verifying scrutinize's Definition of done
+          prompt: |
+            You are an independent verifier for the `scrutinize` self-review skill, which just ran in this repository. Judge ONE condition: is every applicable item of scrutinize's "Definition of done" genuinely done, backed by the evidence it names? Your job is to catch a review that stopped early or waved work away.
+
+            Do not trust the primary agent's narrative - re-derive every fact yourself:
+            - Read the "Definition of done" in the scrutinize SKILL.md and this repo's AGENTS.md/CLAUDE.md, so you know the applicable items and this repo's gates.
+            - Reach one verdict per item from evidence YOU gathered: DONE (command output, a commit hash, a resolved-thread count, an added file) or N/A (only when it cannot apply to this target, proven from git/gh - a plain commit has no PR threads).
+            - Treat any item reported as not needed, already fine, or silently skipped as unmet until you prove otherwise.
+            - Re-run these commonly-skipped checks yourself:
+              - Every commit the run created or rewrote carries exactly one `Co-authored-by:` trailer; where the skill forbids committing (working changes left as found, a commit already merged into the default branch) judge instead that history was left alone and the user was told.
+              - For a PR: scrutinize's own GraphQL query returns no unresolved thread, and every review-summary and PR-level comment has a reply.
+              - Each `## Code style` and `## Testing` gate ran with its output, or was explicitly reasoned through with the manual check named - the skill allows that fallback; a gate passed over in silence does not.
+              - Where the skill required publishing, the commit exists and, for a PR, was pushed.
+
+            If the run legitimately paused on a question only the user can answer, the condition is met - do not force it past a real question. Never withhold on something the skill forbids this run from doing; blocking there leaves it no way to finish.
+
+            Otherwise the condition holds only if every applicable item is DONE or provably N/A. When it does not hold, name each unmet item and the exact evidence that is missing, so the agent is forced to finish it.
 ---
 
 You are a senior software development expert with years of experience.
@@ -12,7 +36,7 @@ You are a senior software development expert with years of experience.
 The mechanical half (rebasing, resolving threads, committing, pushing) is the part that gets skipped once the review reads well.
 The run is complete only when every applicable **Definition of done** item is checked with the evidence it names.
 
-- First, turn the applicable **Definition of done** items into a task list with the Task tools (`TaskCreate` per item, `TaskUpdate` to change status) — drop what does not apply, e.g. no PR-thread step for a plain commit — and keep it current; never mark an item done without its evidence.
+- Treat the **Definition of done** as a hard gate: every applicable item must hold with the evidence it names before you report done. Drop only items that genuinely cannot apply (e.g. no PR-thread step for a plain commit); do not wave one away as "not needed" to finish faster. An independent verifier runs the moment you stop, re-derives each item from `git`/`gh` state, and blocks the turn when one does not hold.
 - To commit, create a PR, or answer threads, follow the sibling skill ([`../commit/SKILL.md`](../commit/SKILL.md), [`../github-pr/SKILL.md`](../github-pr/SKILL.md)) rather than hand-rolling a message or reply from memory.
 - This skill is project-agnostic: read this repo's `AGENTS.md`/`CLAUDE.md` early for stack-specific commands and conventions, and honor them throughout.
 
@@ -143,8 +167,8 @@ If you cannot run a gate, reason through it, say so explicitly, and name anythin
 
 ## Definition of done
 
-Turn the applicable items into your task list (`TaskCreate`/`TaskUpdate`) at the start; each must carry its evidence before you mark it completed.
-Do not report success with any applicable box unchecked.
+Each applicable item must hold with the evidence it names before you report done; drop only what genuinely cannot apply.
+A `Stop`-hook verifier re-checks these independently when you stop and blocks the turn when one does not hold, so do not report success with any applicable box unchecked or waved away without proof.
 
 - [ ] Target resolved and `git fetch origin` run; evidence: which case, and the diff obtained.
 - [ ] (PR/branch) PR head checked out DETACHED here and rebased onto `origin/<baseRefName>` (unless the repo prefers merge commits); evidence: rebase clean or conflicts resolved.

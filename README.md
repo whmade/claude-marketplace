@@ -36,20 +36,13 @@ claude plugin install workflows@whmade    # or /plugin install workflows@whmade 
 Then reload with `/reload-plugins` (or restart) and the `/workflows:*` skills are available; `autoUpdate` keeps them current on later launches.
 A repo's own bare `/commit` in `.claude/skills/` coexists with the namespaced plugin skill; delete the local copy once migrated.
 
-### Enable the task-tracking tools (newer models)
+### How the skills enforce completion
 
-The skills track their **Definition of done** with Claude Code's built-in Task tools (`TaskCreate`/`TaskUpdate`/`TaskList`/`TaskGet`).
-On Opus 4.8, Sonnet 5, Fable 5, and later, these tools are **opt-in** - a session that has not enabled them exposes no task tool, and the skills cannot build their checklist ([Claude Docs: Todo tracking](https://code.claude.com/docs/en/agent-sdk/todo-tracking)).
-Enable them by setting an environment variable in `.claude/settings.json` (repo-level as below, or your user-level `~/.claude/settings.json` to cover every session):
+Each skill ends in a **Definition of done** whose items must hold with the evidence they name, rather than a self-reported checklist the model can skip.
+`scrutinize` goes further: its `SKILL.md` frontmatter registers a `Stop`-hook verifier - an independent subagent that runs when the turn ends, re-derives each done-item from `git`/`gh` state, and blocks the turn when one does not hold.
+Declaring it in the skill means the consuming repo sets nothing up, and `once: true` retires the hook after that one check - a skill hook without it keeps firing on every later turn of the session.
 
-```json
-{
-  "env": { "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1" }
-}
-```
-
-Older models provide the Task tools by default, so this is only needed on the newer families.
-The variable is read at session start; reload or restart after adding it.
+Two limitations: the verifier runs under the session's own tool permissions and cannot prompt for more, so a session that does not already allow `git`/`gh` reads leaves it judging from the transcript alone; and it checks a single stop, so a run it blocks then finishes unverified.
 
 ## The conventions contract (how repos specialize the skills)
 
