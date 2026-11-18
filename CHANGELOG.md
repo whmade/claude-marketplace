@@ -5,6 +5,10 @@ The plugin is unversioned: its version is the commit SHA, and every commit on `m
 Nothing is staged for a release, so there is no "unreleased" section - every entry below is already live.
 Entries are append-only: once one lands it is never edited or deleted, and a change that supersedes an earlier one is added as a new entry, so the log keeps showing what consumers already ran.
 
+## Challenge every character of commit messages and PR descriptions
+
+`scrutinize` now holds the commit message and PR title and body to the same challenge-every-character bar as code: it cuts body text that explains neither why nor how the change was verified, and its Definition of done names the cuts as evidence.
+
 ## Enforce the Definition of done with a Stop-hook verifier
 
 Enforcing the Definition of done no longer relies on the model self-tracking with a task tool (which newer models can lack or decline).

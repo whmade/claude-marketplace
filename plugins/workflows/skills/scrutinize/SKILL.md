@@ -122,6 +122,8 @@ If something is genuinely needed as-is, say so rather than invent a change.
 
 ## 7. Scrutinize the commit message and, for a PR, its description
 
+Hold the commit message and, for a PR, its title and body to section 6's bar: cut any body text that explains neither why nor how the change was verified.
+
 ### Commit message
 
 Judge the message against [`../commit/SKILL.md`](../commit/SKILL.md): imperative subject within limits, body that explains WHY, repo punctuation honored, exactly one `Co-authored-by:` trailer.
@@ -177,6 +179,7 @@ A `Stop`-hook verifier re-checks these independently when you stop and blocks th
 - [ ] Correctness judged on the section-5 points; evidence: one line each, or "n/a".
 - [ ] Every added character challenged; unneeded code removed, rest simplified; evidence: the per-edit verdicts.
 - [ ] Comments and docstring prose cut to the strict standard; repo punctuation enforced; evidence: what was cut, or "none to cut".
+- [ ] Commit message and, for a PR, title and body held to the section-6 bar; evidence: the cuts made, or "none to cut".
 - [ ] Commit message checked against the `commit` skill and fixed if needed.
 - [ ] (PR) PR title/description scrutinized against the `github-pr` format and corrected if drifted; repo-required artifacts present; evidence: conforms as-is / what was fixed.
 - [ ] Verification done: repo `## Code style` + `## Testing` gates run (or auto-detected), or each reasoned through; manual checks named.
