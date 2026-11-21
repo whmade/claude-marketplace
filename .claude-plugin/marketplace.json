@@ -4,7 +4,7 @@
     "name": "whmade",
     "url": "https://github.com/whmade"
   },
-  "description": "Shared Claude Code workflow skills for whme/ and whmade/ repositories.",
+  "description": "Shared Claude Code workflow skills and language servers for whme/ and whmade/ repositories.",
   "plugins": [
     {
       "name": "workflows",
@@ -13,6 +13,14 @@
       "license": "MIT",
       "category": "workflow",
       "keywords": ["commit", "pull-request", "code-review", "self-review"]
+    },
+    {
+      "name": "rust-analyzer-lsp",
+      "source": "./plugins/rust-analyzer-lsp",
+      "description": "rust-analyzer code intelligence for Rust, tuned for agents: no cargo check on save, and its own target directory so it never holds the build lock the agent's cargo commands need.",
+      "license": "MIT",
+      "category": "development",
+      "keywords": ["rust", "rust-analyzer", "lsp", "code-intelligence"]
     }
   ]
 }

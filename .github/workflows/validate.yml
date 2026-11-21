@@ -1,6 +1,6 @@
 name: validate
 
-# The `workflows` plugin is unversioned, so every commit to `main` ships to
+# The plugins are unversioned, so every commit to `main` ships to
 # consumers on their next session. This gate keeps `main` shippable. A branch
 # ruleset makes the `validate` check required before a change lands on `main` -
 # create it with scripts/setup-branch-ruleset.sh (needs the repo to be public).
@@ -24,3 +24,4 @@ jobs:
           npm install -g @anthropic-ai/claude-code
           claude plugin validate . --strict
           claude plugin validate ./plugins/workflows --strict
+          claude plugin validate ./plugins/rust-analyzer-lsp --strict

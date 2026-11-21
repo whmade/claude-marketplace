@@ -1,0 +1,26 @@
+{
+  "name": "rust-analyzer-lsp",
+  "description": "rust-analyzer code intelligence for Rust, tuned for agents: no cargo check on save, and its own target directory so it never holds the build lock the agent's cargo commands need.",
+  "author": {
+    "name": "whmade",
+    "url": "https://github.com/whmade"
+  },
+  "homepage": "https://github.com/whmade/claude-marketplace",
+  "repository": "https://github.com/whmade/claude-marketplace",
+  "license": "MIT",
+  "keywords": ["rust", "rust-analyzer", "lsp", "code-intelligence"],
+  "lspServers": {
+    "rust-analyzer": {
+      "command": "rust-analyzer",
+      "extensionToLanguage": {
+        ".rs": "rust"
+      },
+      "initializationOptions": {
+        "checkOnSave": false,
+        "cargo": {
+          "targetDir": true
+        }
+      }
+    }
+  }
+}
