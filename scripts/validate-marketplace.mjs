@@ -101,13 +101,42 @@ function validatePlugin(entryName, source) {
   if (existsSync(join(pluginDir, ".claude-plugin", "skills"))) {
     err(`plugin "${entryName}": skills/ must be at the plugin root, not inside .claude-plugin/`);
   }
-  validateSkills(entryName, pluginDir);
+  const hasLspServers = manifest?.lspServers !== undefined;
+  if (hasLspServers) validateLspServers(entryName, manifest.lspServers);
+  // A language-server plugin ships no skills; every other plugin must.
+  validateSkills(entryName, pluginDir, !hasLspServers);
 }
 
-function validateSkills(entryName, pluginDir) {
+// Inline `lspServers` only: a path or array form would need resolving, and no
+// plugin here uses one.
+function validateLspServers(entryName, servers) {
+  if (typeof servers !== "object" || servers === null || Array.isArray(servers)) {
+    err(`plugin "${entryName}": \`lspServers\` must be an inline object of servers`);
+    return;
+  }
+  const names = Object.keys(servers);
+  if (names.length === 0) err(`plugin "${entryName}": \`lspServers\` declares no server`);
+  for (const name of names) {
+    const where = `plugin "${entryName}" lspServers.${name}`;
+    const server = servers[name];
+    if (typeof server?.command !== "string" || server.command === "") {
+      err(`${where}: missing \`command\``);
+    }
+    const map = server?.extensionToLanguage;
+    if (typeof map !== "object" || map === null || Object.keys(map).length === 0) {
+      err(`${where}: \`extensionToLanguage\` must map at least one extension`);
+    } else {
+      for (const ext of Object.keys(map)) {
+        if (!ext.startsWith(".")) err(`${where}: extension "${ext}" must start with "."`);
+      }
+    }
+  }
+}
+
+function validateSkills(entryName, pluginDir, required) {
   const skillsDir = join(pluginDir, "skills");
   if (!existsSync(skillsDir)) {
-    err(`plugin "${entryName}": no skills/ directory - the plugin ships no skills`);
+    if (required) err(`plugin "${entryName}": no skills/ directory - the plugin ships no skills`);
     return;
   }
   let skillCount = 0;

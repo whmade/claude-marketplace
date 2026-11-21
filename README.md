@@ -1,15 +1,19 @@
 # whmade Claude marketplace
 
-A [Claude Code plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces) and the single source of truth for the development-workflow skills shared across [`whme/`](https://github.com/whme) and [`whmade/`](https://github.com/whmade) repos.
-Add it once per repo; the skills then stay in sync instead of being copy-pasted and drifting.
+A [Claude Code plugin marketplace](https://code.claude.com/docs/en/plugin-marketplaces) and the single source of truth for the development-workflow skills and language-server setup shared across [`whme/`](https://github.com/whme) and [`whmade/`](https://github.com/whmade) repos.
+Add it once per repo; the plugins then stay in sync instead of being copy-pasted and drifting.
 
-It ships one plugin, **`workflows`**, bundling three skills:
+It ships two plugins.
+
+**`workflows`** bundles three skills:
 
 | Skill | What it does |
 |-------|--------------|
 | `/workflows:commit` | Write a commit message in the repo's conventions, with the mandatory `Co-authored-by` trailer. |
 | `/workflows:github-pr` | Create or update a PR, and reply to and resolve every comment on it. |
 | `/workflows:scrutinize` | Self-review a PR, commit, range, or working changes, then publish. |
+
+**`rust-analyzer-lsp`** runs `rust-analyzer` for `.rs` files, giving the agent go-to-definition, references, implementations and hover; see [The `rust-analyzer-lsp` plugin](#the-rust-analyzer-lsp-plugin).
 
 ## Using it in a repo
 
@@ -36,6 +40,8 @@ claude plugin install workflows@whmade    # or /plugin install workflows@whmade 
 Then reload with `/reload-plugins` (or restart) and the `/workflows:*` skills are available; `autoUpdate` keeps them current on later launches.
 A repo's own bare `/commit` in `.claude/skills/` coexists with the namespaced plugin skill; delete the local copy once migrated.
 
+`rust-analyzer-lsp@whmade` is enabled and installed the same way; it has extra setup, below.
+
 ### How the skills enforce completion
 
 Each skill ends in a **Definition of done** whose items must hold with the evidence they name, rather than a self-reported checklist the model can skip.
@@ -43,6 +49,38 @@ Each skill ends in a **Definition of done** whose items must hold with the evide
 Declaring it in the skill means the consuming repo sets nothing up, and `once: true` retires the hook after that one check - a skill hook without it keeps firing on every later turn of the session.
 
 Two limitations: the verifier runs under the session's own tool permissions and cannot prompt for more, so a session that does not already allow `git`/`gh` reads leaves it judging from the transcript alone; and it checks a single stop, so a run it blocks then finishes unverified.
+
+## The `rust-analyzer-lsp` plugin
+
+It differs from Anthropic's `rust-analyzer-lsp@claude-plugins-official`, which starts `rust-analyzer` with its defaults, in two settings passed as `initializationOptions`:
+
+- `checkOnSave: false`. By default `rust-analyzer` runs `cargo check --workspace --all-targets` at startup and after every edit the agent makes. That check holds the build-directory lock, so the agent's own `cargo build`, `test` or `clippy` waits behind it, and its errors reach the agent only once it finishes, which in testing was after the agent had moved on. Definitions, references, implementations and hover do not need it. The cost: after-edit diagnostics carry no compiler errors, so the agent still runs `cargo check` or `cargo clippy` itself.
+- `cargo.targetDir: true`. The build scripts and proc macros `rust-analyzer` still compiles at startup go to `target/rust-analyzer` instead of the shared `target/`, so they do not take the build lock either. The cost is extra disk per checkout.
+
+A consuming repo cannot set these itself: Claude Code has no override for a plugin's server settings, and a `rust-analyzer.toml` with `cargo.targetDir` was ignored when tested.
+
+The plugin does not install the server; put `rust-analyzer` on `PATH`. Pinning it in the repo's `rust-toolchain.toml` keeps it in step with toolchain bumps:
+
+```toml
+[toolchain]
+components = ["rust-analyzer"]
+```
+
+Enable it in the repo's `.claude/settings.json`, and disable the official plugin. Both name their server `rust-analyzer`, and when both are enabled only one server starts, configured by whichever plugin loads last, so a user-level install of the official one can silently drop the settings above:
+
+```json
+{
+  "enabledPlugins": {
+    "rust-analyzer-lsp@whmade": true,
+    "rust-analyzer-lsp@claude-plugins-official": false
+  }
+}
+```
+
+Limits:
+
+- `rust-analyzer` analyses the host target only. Code behind `#[cfg(target_os = ...)]` for another platform is invisible to it, so an empty result there proves nothing; tell agents to grep such code.
+- Each session starts its own server, which took about 1.7 GB of RAM on a 20k-line workspace that uses the `windows` crate.
 
 ## The conventions contract (how repos specialize the skills)
 
@@ -81,6 +119,8 @@ plugins/workflows/
     commit/SKILL.md
     github-pr/SKILL.md
     scrutinize/SKILL.md
+plugins/rust-analyzer-lsp/
+  .claude-plugin/plugin.json        # plugin manifest with the inline lspServers entry
 scripts/validate-marketplace.mjs    # dependency-free structural validator (CI + local)
 scripts/setup-branch-ruleset.sh     # makes the `validate` check required on main
 .github/workflows/validate.yml      # CI: validates manifests + skills on every push
@@ -90,7 +130,7 @@ LICENSE                             # MIT
 
 ## Updates and stability
 
-The plugin carries no `version`, so its version is the git commit SHA: every commit on `main` is an update consumers pick up next session.
+The plugins carry no `version`, so their version is the git commit SHA: every commit on `main` is an update consumers pick up next session.
 There is no staging branch, so keep `main` green; the `validate` CI check is the guard and should be a required check.
 Roll back a bad change with `git revert` on `main`.
 Record notable or breaking changes in [`CHANGELOG.md`](CHANGELOG.md).
@@ -101,6 +141,7 @@ Record notable or breaking changes in [`CHANGELOG.md`](CHANGELOG.md).
 # Validate manifests and skill frontmatter
 claude plugin validate .
 claude plugin validate ./plugins/workflows
+claude plugin validate ./plugins/rust-analyzer-lsp
 
 # Load the plugin without a marketplace, to try the skills
 claude --plugin-dir ./plugins/workflows

@@ -1,9 +1,14 @@
 # Changelog
 
-Notable changes to the `workflows` plugin, especially breaking ones, newest first.
-The plugin is unversioned: its version is the commit SHA, and every commit on `main` reaches consumers on their next session.
+Notable changes to the plugins in this marketplace, especially breaking ones, newest first.
+The plugins are unversioned: their version is the commit SHA, and every commit on `main` reaches consumers on their next session.
 Nothing is staged for a release, so there is no "unreleased" section - every entry below is already live.
 Entries are append-only: once one lands it is never edited or deleted, and a change that supersedes an earlier one is added as a new entry, so the log keeps showing what consumers already ran.
+
+## Add the `rust-analyzer-lsp` plugin
+
+A second plugin, `rust-analyzer-lsp`, runs `rust-analyzer` for `.rs` files with `checkOnSave: false` and `cargo.targetDir: true`, so the server never runs `cargo check` after an agent's edit and never holds the build lock the agent's own cargo commands need.
+It ships no skills; the structural validator now accepts a plugin that declares `lspServers` instead, and checks each server's `command` and `extensionToLanguage`.
 
 ## Challenge every character of commit messages and PR descriptions
 
